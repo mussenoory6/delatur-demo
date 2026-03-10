@@ -39,6 +39,7 @@ function ResultCard({
   onExpand: (item: ResultItem) => void
 }) {
   const [position, setPosition] = useState(50)
+  const [isHovered, setIsHovered] = useState(false)
 
   const handlePositionChange = useCallback((pos: number) => {
     setPosition(Math.round(pos))
@@ -47,50 +48,69 @@ function ResultCard({
   return (
     <motion.div
       className="group overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm"
-      whileHover={{ boxShadow: "0 16px 48px rgba(0,0,0,0.1)" }}
-      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ boxShadow: "0 20px 56px rgba(0,0,0,0.12), 0 4px 16px rgba(79,148,144,0.08)" }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
     >
-      {/* Slider */}
-      <div className="relative cursor-pointer" onClick={() => onExpand(item)}>
+      {/* Slider — consistent dimensions, clean containment */}
+      <div
+        className="relative cursor-pointer overflow-hidden rounded-t-3xl"
+        onClick={() => onExpand(item)}
+      >
         <ReactCompareSlider
-          itemOne={
-            <ReactCompareSliderImage
-              src={item.before}
-              alt={`Före — ${item.label}`}
-              style={{ objectFit: "cover", objectPosition: "center 20%" }}
-            />
-          }
-          itemTwo={
-            <ReactCompareSliderImage
-              src={item.after}
-              alt={`Efter — ${item.label}`}
-              style={{ objectFit: "cover", objectPosition: "center 20%" }}
-            />
-          }
-          handle={<SliderHandle />}
-          onPositionChange={handlePositionChange}
-          style={{ height: "280px" }}
-        />
+            itemOne={
+              <ReactCompareSliderImage
+                src={item.before}
+                alt={`Före — ${item.label}`}
+                style={{ objectFit: "cover", objectPosition: "center center" }}
+              />
+            }
+            itemTwo={
+              <ReactCompareSliderImage
+                src={item.after}
+                alt={`Efter — ${item.label}`}
+                style={{ objectFit: "cover", objectPosition: "center center" }}
+              />
+            }
+            handle={<SliderHandle />}
+            onPositionChange={handlePositionChange}
+            style={{ height: "320px" }}
+          />
 
-        {/* Before / After labels */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-between px-4 pb-3">
-          <span className="rounded-full bg-black/50 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+        {/* Före/Efter labels — fade in on hover for premium feel */}
+        <motion.div
+          className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-between px-4 pb-3"
+          initial={false}
+          animate={{ opacity: isHovered ? 1 : 0.85 }}
+          transition={{ duration: 0.25 }}
+        >
+          <span className="rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider text-white backdrop-blur-sm">
             Före
           </span>
           <span
-            className="rounded-full px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm"
-            style={{ backgroundColor: "color-mix(in srgb, var(--brand) 70%, transparent)" }}
+            className="rounded-full px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider text-white backdrop-blur-sm"
+            style={{ backgroundColor: "color-mix(in srgb, var(--brand) 75%, transparent)" }}
           >
             Efter
           </span>
-        </div>
+        </motion.div>
 
         {/* Expand hint */}
-        <div className="pointer-events-none absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
+        <motion.div
+          className="pointer-events-none absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm"
+          initial={false}
+          animate={{
+            opacity: isHovered ? 1 : 0,
+            scale: isHovered ? 1 : 0.9,
+          }}
+          transition={{ duration: 0.2 }}
+          style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
+        >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
             <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
           </svg>
-        </div>
+        </motion.div>
       </div>
 
       {/* Card footer */}
@@ -145,20 +165,20 @@ function Lightbox({
           className="relative w-full max-w-3xl overflow-hidden rounded-3xl shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Large compare slider */}
+          {/* Large compare slider — clean presentation */}
           <ReactCompareSlider
             itemOne={
               <ReactCompareSliderImage
                 src={item.before}
                 alt={`Före — ${item.label}`}
-                style={{ objectFit: "cover", objectPosition: "center 20%" }}
+                style={{ objectFit: "cover", objectPosition: "center center" }}
               />
             }
             itemTwo={
               <ReactCompareSliderImage
                 src={item.after}
                 alt={`Efter — ${item.label}`}
-                style={{ objectFit: "cover", objectPosition: "center 20%" }}
+                style={{ objectFit: "cover", objectPosition: "center center" }}
               />
             }
             handle={<SliderHandle />}
@@ -258,7 +278,7 @@ export default function ResultsSection() {
           >
             {results.items.map((item, i) => (
               <div
-                key={item.label}
+                key={`${item.label}-${i}`}
                 className="flex-shrink-0 w-[82vw] snap-start sm:w-[68vw] md:flex-shrink md:w-auto"
               >
                 <RevealOnScroll delay={i * 0.1}>

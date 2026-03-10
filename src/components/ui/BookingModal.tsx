@@ -798,7 +798,7 @@ function Step4Details({
           </div>
         </div>
         <span className="text-sm text-neutral-600">
-          Jag godkänner att Delatur kontaktar mig angående min bokning
+          Jag godkänner att {siteContent.company.name} kontaktar mig angående min bokning
         </span>
       </label>
     </div>
@@ -881,7 +881,7 @@ function Step5Confirmation({
             <div className="border-t border-neutral-200" />
             <div className="flex justify-between text-sm">
               <span className="font-medium text-neutral-600">Plats</span>
-              <span className="font-semibold text-neutral-800">{siteContent.company.addressLine2}</span>
+              <span className="font-semibold text-neutral-800">{siteContent.company.addressLine2 || siteContent.company.address}</span>
             </div>
           </div>
         </div>

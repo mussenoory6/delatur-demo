@@ -1,0 +1,17 @@
+I want to create a new premium demo site for a clinic based on the information from [PASTA_IN_URL_HÄR].
+
+Using the existing architecture and the rules in our .cursorrules file, please:
+
+1. Extract the services, prices, and 'About' info from the URL (use mcp_web_fetch if needed).
+
+2. Map their services into our 'Interactive Price Menu' structure in src/content/siteContent.ts (group similar services into categories like Ansiktsbehandling, Fransar & Bryn, etc.).
+
+3. Replace the text content (Headlines, About section, Contact info) with the new clinic's data.
+
+4. Keep the entire visual design (Aura chat, animations, layouts, and premium styling) EXACTLY as the current master template.
+
+5. Use placeholders for images where the new clinic's specific images aren't available yet, but keep the 'Founder Reveal' layout ready.
+
+6. If the clinic has different service types than Botox/Fillers, make ServiceMenuOverlay and ServicesSection use dynamic category ids from siteContent instead of hardcoded "botox" | "fillers".
+
+Make it look like a 10/10 custom-built site for them, but using our proven premium framework. All text in Swedish.

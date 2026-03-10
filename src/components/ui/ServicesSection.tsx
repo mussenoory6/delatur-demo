@@ -4,53 +4,26 @@ import { siteContent } from "@/content/siteContent"
 import RevealOnScroll from "./RevealOnScroll"
 import ServiceMenuOverlay from "./ServiceMenuOverlay"
 
-type CategoryId = "botox" | "fillers"
+type CategoryId = string
 
 // ── Card accent SVGs ────────────────────────────────────────────────────────
 
-function BotoxAccent() {
+function AccentA() {
   return (
-    <svg
-      width="80"
-      height="48"
-      viewBox="0 0 80 48"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="0.9"
-      strokeLinecap="round"
-      opacity="0.22"
-    >
-      {/* Forehead wrinkle lines */}
+    <svg width="80" height="48" viewBox="0 0 80 48" fill="none" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" opacity="0.22">
       <path d="M10 16 Q40 10, 70 16" />
       <path d="M14 24 Q40 18, 66 24" />
       <path d="M20 32 Q40 26, 60 32" />
-      {/* Glabella mark */}
-      <path d="M37 36 L37 44" strokeWidth="1.2" />
-      <path d="M43 36 L43 44" strokeWidth="1.2" />
     </svg>
   )
 }
 
-function FillersAccent() {
+function AccentB() {
   return (
-    <svg
-      width="72"
-      height="52"
-      viewBox="0 0 72 52"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="0.9"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      opacity="0.22"
-    >
-      {/* Lips outline */}
+    <svg width="72" height="52" viewBox="0 0 72 52" fill="none" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" opacity="0.22">
       <path d="M4 22 C10 12, 22 8, 36 16 C50 8, 62 12, 68 22" />
       <path d="M4 22 C10 34, 22 44, 36 40 C50 44, 62 34, 68 22" />
-      {/* Cupid's bow */}
       <path d="M36 16 C34 20, 35 23, 36 16" />
-      {/* Subtle volume lines */}
-      <path d="M20 32 Q28 38, 36 36 Q44 38, 52 32" strokeWidth="0.7" opacity="0.6" />
     </svg>
   )
 }
@@ -66,8 +39,9 @@ function CategoryCard({
   index: number
   onOpen: (id: CategoryId) => void
 }) {
-  const isBotox = category.id === "botox"
+  const useAltGradient = index % 2 === 1
   const [hovered, setHovered] = useState(false)
+  const fromPrice = "fromPrice" in category ? (category as { fromPrice?: string }).fromPrice : undefined
 
   return (
     <RevealOnScroll delay={index * 0.12}>
@@ -80,18 +54,18 @@ function CategoryCard({
           boxShadow:
             "0 28px 72px rgba(0,0,0,0.10), 0 8px 24px rgba(92,144,144,0.10)",
         }}
-        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
         onHoverStart={() => setHovered(true)}
         onHoverEnd={() => setHovered(false)}
-        onClick={() => onOpen(category.id as CategoryId)}
+        onClick={() => onOpen(category.id)}
       >
         {/* Decorative top band */}
         <div
           className="relative h-36 w-full overflow-hidden"
           style={{
-            background: isBotox
-              ? "linear-gradient(135deg, hsl(174,22%,96%) 0%, hsl(174,28%,90%) 100%)"
-              : "linear-gradient(135deg, hsl(38,30%,96%) 0%, hsl(174,22%,92%) 100%)",
+            background: useAltGradient
+              ? "linear-gradient(135deg, hsl(38,30%,96%) 0%, hsl(174,22%,92%) 100%)"
+              : "linear-gradient(135deg, hsl(174,22%,96%) 0%, hsl(174,28%,90%) 100%)",
           }}
         >
           {/* Accent SVG */}
@@ -99,7 +73,7 @@ function CategoryCard({
             className="absolute bottom-4 right-6 transition-transform duration-700 group-hover:scale-110 group-hover:translate-y-[-4px]"
             style={{ color: "var(--brand)" }}
           >
-            {isBotox ? <BotoxAccent /> : <FillersAccent />}
+            {useAltGradient ? <AccentB /> : <AccentA />}
           </div>
 
           {/* Category label pill */}
@@ -183,7 +157,7 @@ function CategoryCard({
               className="text-base font-medium text-neutral-600"
               style={{ fontFamily: "'Playfair Display', Georgia, serif", letterSpacing: "0.02em" }}
             >
-              {isBotox ? "Från 1 800 kr" : "Från 2 500 kr"}
+              {fromPrice ?? "Se priser"}
             </span>
             <motion.button
               className="btn-premium btn-glow btn-glow-teal btn-shimmer flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white"
@@ -210,7 +184,7 @@ function CategoryCard({
 export default function ServicesSection() {
   const { services } = siteContent
   const [overlayOpen, setOverlayOpen] = useState(false)
-  const [overlayCategory, setOverlayCategory] = useState<CategoryId>("botox")
+  const [overlayCategory, setOverlayCategory] = useState<CategoryId>(services.categories[0]?.id ?? "")
 
   const openMenu = (id: CategoryId) => {
     setOverlayCategory(id)

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion"
+import { siteContent } from "@/content/siteContent"
 import RevealOnScroll from "./RevealOnScroll"
 
 const GALLERY = [
@@ -20,8 +21,8 @@ const GALLERY = [
   },
 ]
 
-const INSTAGRAM_HANDLE = "@delatur.klinik"
-const INSTAGRAM_URL = "https://www.instagram.com/"
+const INSTAGRAM_HANDLE = siteContent.instagram?.handle ?? "@kliniken"
+const INSTAGRAM_URL = siteContent.instagram?.url ?? "https://www.instagram.com/"
 
 function InstagramIcon() {
   return (
@@ -90,7 +91,7 @@ export default function InstagramTeaser() {
                 rel="noopener noreferrer"
                 className="group relative block aspect-square overflow-hidden rounded-2xl"
                 whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.45, ease: "easeOut" }}
               >
                 <img
                   src={img.src}

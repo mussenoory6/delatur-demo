@@ -4,8 +4,10 @@ import { siteContent } from "@/content/siteContent"
 import { useBooking } from "@/context/BookingContext"
 
 export default function Navbar() {
+  const { company } = siteContent
   const { openBooking } = useBooking()
   const [scrolled, setScrolled] = useState(false)
+  const [logoError, setLogoError] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -31,11 +33,21 @@ export default function Navbar() {
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
         <a href="/" className="flex items-center gap-2">
-          <img
-            src={siteContent.company.logoUrl}
-            alt={siteContent.company.name}
-            className="h-14 w-auto object-contain"
-          />
+          {logoError ? (
+            <span
+              className="text-xl font-semibold tracking-tight text-neutral-900"
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            >
+              {company.name}
+            </span>
+          ) : (
+            <img
+              src={company.logoUrl}
+              alt={company.name}
+              className="h-14 w-auto object-contain"
+              onError={() => setLogoError(true)}
+            />
+          )}
         </a>
 
         <nav className="hidden gap-7 text-sm text-neutral-600 md:flex">

@@ -84,7 +84,7 @@ export default function TestimonialsSection() {
                   y: -8,
                   boxShadow: "0 20px 56px rgba(0,0,0,0.09), 0 4px 16px rgba(185,151,85,0.08)",
                 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
               >
                 <Stars count={item.rating} />
                 <p className="mt-4 leading-[1.8] text-neutral-600">"{item.text}"</p>
@@ -106,7 +106,7 @@ export default function TestimonialsSection() {
         <RevealOnScroll delay={0.3} className="mt-14 flex flex-wrap items-center gap-4">
           {/* Google Reviews badge */}
           <a
-            href="https://www.google.com/maps/search/?api=1&query=delatur"
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(siteContent.company.address)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-3 rounded-2xl bg-white px-5 py-4 transition hover:shadow-md"
@@ -130,7 +130,7 @@ export default function TestimonialsSection() {
                     </svg>
                   ))}
                 </div>
-                <span className="text-sm font-semibold text-neutral-800">5.0</span>
+                <span className="text-sm font-semibold text-neutral-800">{siteContent.stats.find(s => s.label === "Genomsnitt")?.value ?? "4.8 ★"}</span>
               </div>
             </div>
           </a>

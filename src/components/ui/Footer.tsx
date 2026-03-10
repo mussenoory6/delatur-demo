@@ -16,7 +16,7 @@ export default function Footer() {
               className="h-8 w-auto object-contain opacity-80"
             />
             <p className="max-w-[240px] text-xs leading-relaxed text-neutral-500">
-              Estetiska injektionsbehandlingar i Örebro av {company.treater}, {company.treaterTitle.toLowerCase()}.
+              {company.tagline}. {company.address}
             </p>
           </div>
 
@@ -38,7 +38,7 @@ export default function Footer() {
               </a>
             </div>
             <p className="text-xs text-neutral-400">
-              {company.addressLine2} · {company.address}
+              {company.addressLine2 ? `${company.addressLine2} · ` : ""}{company.address}
             </p>
             <p className="text-xs text-neutral-400">
               <a href={company.phoneHref} className="hover:text-neutral-600 transition">{company.phone}</a>
@@ -53,7 +53,7 @@ export default function Footer() {
           style={{ borderTop: "1px solid var(--sand)" }}
         >
           <p>© {new Date().getFullYear()} {company.name}. Alla rättigheter förbehållna.</p>
-          <p>Estetiska injektionsbehandlingar · Örebro</p>
+          <p>{(company as { footerTagline?: string }).footerTagline ?? company.tagline}</p>
         </div>
       </div>
     </footer>

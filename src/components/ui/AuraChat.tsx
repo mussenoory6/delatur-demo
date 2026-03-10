@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { motion, AnimatePresence } from "framer-motion"
+import { siteContent } from "@/content/siteContent"
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -13,36 +15,23 @@ interface Message {
 
 // ─── Canned responses ────────────────────────────────────────────────────────
 
-const QUICK_REPLIES = [
-  { id: "tider",    label: "Se lediga tider" },
-  { id: "priser",   label: "Prislista för behandlingar" },
-  { id: "eftervard",label: "Fråga om eftervård" },
-  { id: "kontakt",  label: "Kontakta kliniken" },
-]
-
-const AUTO_RESPONSES: Record<string, string> = {
-  tider:
-    "Vi har lediga tider redan i veckan. Klicka på 'Boka tid' i menyn för att se alla tillgängliga pass — du kan boka direkt online.",
-  priser:
-    "Vår prislista hittar du på hemsidan under Behandlingar. Vill du ha en personlig offert är du välkommen att kontakta oss direkt.",
-  eftervard:
-    "Efter din behandling rekommenderar vi att du undviker direkt solljus i 48 timmar och håller huden väl återfuktad. Vi skickar alltid en personlig eftervårdsguide via mejl.",
-  kontakt:
-    "Du når oss enklast på info@delatur.se eller ring oss på 08-XXX XX XX. Vi svarar på vardagar 9–17.",
-}
-
-const FALLBACK =
-  "Tack för ditt meddelande! En av våra hudterapeuter återkommer till dig så snart som möjligt."
-
 function getResponse(text: string): string {
+  const { responses, fallback } = siteContent.aura
   const lower = text.toLowerCase()
-  if (lower.includes("tid") || lower.includes("boka")) return AUTO_RESPONSES.tider
+  if (lower.includes("tid") || lower.includes("boka")) return responses.tider
   if (lower.includes("pris") || lower.includes("kostar") || lower.includes("behandl"))
-    return AUTO_RESPONSES.priser
-  if (lower.includes("eftervård") || lower.includes("efter")) return AUTO_RESPONSES.eftervard
-  if (lower.includes("kontakt") || lower.includes("telefon") || lower.includes("mejl"))
-    return AUTO_RESPONSES.kontakt
-  return FALLBACK
+    return responses.priser
+  if (lower.includes("ansikts") || lower.includes("ansiktsbehandling")) return responses.ansikts
+  if (lower.includes("lash") || lower.includes("brow") || lower.includes("frans") || lower.includes("bryn"))
+    return responses.lashbrow
+  if (lower.includes("eftervård") || lower.includes("efter")) return responses.eftervard
+  if (lower.includes("kontakt") || lower.includes("telefon") || lower.includes("mejl") || lower.includes("ring"))
+    return responses.kontakt
+  if (lower.includes("adress") || lower.includes("var") || lower.includes("hitta") || lower.includes("örebro"))
+    return responses.adress
+  if (lower.includes("öppettider") || lower.includes("öppet") || lower.includes("stängt"))
+    return responses.oppettider
+  return fallback
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -71,7 +60,7 @@ function MessageBubble({ msg }: { msg: Message }) {
     <motion.div
       initial={{ opacity: 0, y: 10, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.38, ease: "easeOut" }}
       className={`flex ${isAura ? "justify-start" : "justify-end"} mb-2.5`}
     >
       <div
@@ -165,7 +154,7 @@ export default function AuraChat() {
         {
           id: "intro",
           role: "aura",
-          text: "Välkommen till Delatur. Jag är Aura — hur kan jag hjälpa dig idag?",
+          text: siteContent.aura.intro,
         },
       ])
     }
@@ -200,7 +189,7 @@ export default function AuraChat() {
     addUserMessage(trimmed)
   }
 
-  return (
+  const chatContent = (
     <>
       {/* Keyframes injected once */}
       <style>{`
@@ -218,7 +207,7 @@ export default function AuraChat() {
         whileTap={{ scale: 0.93 }}
         transition={{ type: "spring", stiffness: 400, damping: 22 }}
         aria-label={open ? "Stäng Aura" : "Öppna Aura"}
-        className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full"
+        className="fixed bottom-6 right-6 z-[90] flex items-center justify-center w-14 h-14 rounded-full"
         style={{
           background:
             "linear-gradient(145deg, hsl(38,55%,68%) 0%, hsl(38,42%,52%) 100%)",
@@ -285,7 +274,7 @@ export default function AuraChat() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.96 }}
             transition={{ type: "spring", stiffness: 320, damping: 30, mass: 0.9 }}
-            className="fixed bottom-24 right-6 z-50 w-[340px] max-w-[calc(100vw-3rem)] flex flex-col overflow-hidden"
+            className="fixed bottom-24 right-6 z-[90] w-[340px] max-w-[calc(100vw-3rem)] flex flex-col overflow-hidden"
             style={{
               borderRadius: "1.5rem",
               background: "rgba(253,251,248,0.82)",
@@ -357,10 +346,15 @@ export default function AuraChat() {
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.28, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ delay: 0.28, duration: 0.4, ease: "easeOut" }}
                   className="flex flex-col gap-2 mt-1 mb-2"
                 >
-                  {QUICK_REPLIES.map((qr) => (
+                  {(siteContent.aura.quickReplies ?? [
+                    { id: "tider", label: "Se lediga tider" },
+                    { id: "priser", label: "Prislista för behandlingar" },
+                    { id: "eftervard", label: "Fråga om eftervård" },
+                    { id: "kontakt", label: "Kontakta kliniken" },
+                  ]).map((qr) => (
                     <QuickReplyButton
                       key={qr.id}
                       label={qr.label}
@@ -463,7 +457,7 @@ export default function AuraChat() {
                 className="text-center text-[10px] mt-2 tracking-widest uppercase"
                 style={{ color: "rgba(185,151,85,0.6)", letterSpacing: "0.16em" }}
               >
-                Delatur Klinik · Alltid här
+                {siteContent.aura.footer}
               </p>
             </div>
           </motion.div>
@@ -471,4 +465,8 @@ export default function AuraChat() {
       </AnimatePresence>
     </>
   )
+
+  return typeof document !== "undefined"
+    ? createPortal(chatContent, document.body)
+    : chatContent
 }

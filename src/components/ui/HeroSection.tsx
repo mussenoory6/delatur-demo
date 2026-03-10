@@ -1,9 +1,11 @@
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { siteContent } from "@/content/siteContent"
 import { useBooking } from "@/context/BookingContext"
 
-const EASE = [0.16, 1, 0.3, 1] as [number, number, number, number]
+/** Use supported easing string for production build compatibility */
+const EASE = "easeOut" as const
+const HERO_VIDEO = "/3181733-uhd_3840_2160_25fps.mp4"
 
 const staggerContainer = {
   hidden: {},
@@ -23,6 +25,8 @@ const fadeIn = {
 export default function HeroSection() {
   const { hero, company } = siteContent
   const { openBooking } = useBooking()
+  const [videoReady, setVideoReady] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   const sectionRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({
@@ -30,10 +34,8 @@ export default function HeroSection() {
     offset: ["start start", "end start"],
   })
 
-  // Parallax: bg image moves slower than scroll (subtle drift)
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"])
-  // Hero photo drifts gently upward
-  const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"])
+  // Parallax: video container drifts gently on scroll
+  const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "8%"])
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden" style={{ backgroundColor: "#faf9f7" }}>
@@ -88,17 +90,13 @@ export default function HeroSection() {
         />
       </svg>
 
-      {/* ── Parallax decorative background image ──────── */}
-      <motion.div
-        className="pointer-events-none absolute right-0 top-0 h-full w-1/2 opacity-[0.055]"
+      {/* ── Gradient overlay for text readability (left side) ──────── */}
+      <div
+        className="pointer-events-none absolute inset-0 z-[1]"
         style={{
-          backgroundImage: `url(${hero.heroImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          y: bgY,
+          background: "linear-gradient(90deg, #faf9f7 0%, #faf9f7 38%, transparent 65%)",
         }}
       />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-gradient-to-r from-[#faf9f7] to-transparent" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-28 md:px-6 md:py-40">
         <div className="grid items-center gap-12 md:grid-cols-2 md:gap-16">
@@ -163,50 +161,91 @@ export default function HeroSection() {
             </motion.div>
 
             <motion.p variants={fadeUp} className="mt-8 text-sm text-neutral-500">
-              ✦ &nbsp;{company.addressLine2}, {company.address}
+              ✦ &nbsp;{company.addressLine2 ? `${company.addressLine2}, ` : ""}{company.address}
             </motion.p>
           </motion.div>
 
-          {/* ── RIGHT — Image card ────────────────────── */}
+          {/* ── RIGHT — Cinematic video container (inset, glassmorphism) ── */}
           <motion.div
             className="relative"
             variants={fadeIn}
             initial="hidden"
             animate="show"
           >
-            <motion.div style={{ y: imgY }}>
-              <div className="overflow-hidden rounded-3xl shadow-xl">
+            <motion.div
+              className="relative overflow-hidden rounded-[40px] shadow-2xl"
+              style={{
+                y: videoY,
+                border: "1px solid rgba(185,151,85,0.35)",
+                boxShadow:
+                  "0 32px 80px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.15)",
+              }}
+            >
+              {/* Video container — aspect ratio preserved, object-cover */}
+              <div className="relative aspect-[4/3] min-h-[320px] w-full md:aspect-[16/10] md:min-h-[420px]">
+                {/* Poster fallback for low bandwidth / mobile */}
                 <img
                   src={hero.heroImage}
-                  alt="Estetiska behandlingar hos Delatur"
-                  className="h-[480px] w-full object-cover"
+                  alt=""
+                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+                    videoReady ? "opacity-0" : "opacity-100"
+                  }`}
+                  loading="eager"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+
+                <motion.div
+                  className="absolute inset-0"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: videoReady ? 1 : 0 }}
+                  transition={{ duration: 1.2, ease: EASE }}
+                >
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="auto"
+                    poster={hero.heroImage}
+                    onCanPlay={() => setVideoReady(true)}
+                    onLoadedData={() => setVideoReady(true)}
+                    className="h-full w-full object-cover"
+                  >
+                    <source src={HERO_VIDEO} type="video/mp4" />
+                  </video>
+                </motion.div>
+
+                {/* Warm-cream overlay for readability */}
+                <div
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(to top, rgba(250,249,247,0.55) 0%, rgba(250,249,247,0.12) 40%, transparent 70%)",
+                  }}
+                />
+              </div>
+
+              {/* Floating info card — glassmorphism */}
+              <div className="glass-gold absolute bottom-5 left-5 right-5 rounded-2xl p-4">
+                <p
+                  className="mb-2 text-xs font-medium uppercase"
+                  style={{ color: "var(--brand)", letterSpacing: "0.16em" }}
+                >
+                  {hero.heroCard.label}
+                </p>
+                <div className="flex flex-col gap-2">
+                  {hero.heroCard.items.map((item) => (
+                    <div key={item.label} className="flex items-center gap-2.5">
+                      <span className="text-xs" style={{ color: "var(--brand)" }}>{item.icon}</span>
+                      <div>
+                        <span className="text-sm font-medium text-neutral-900">{item.label}</span>
+                        <span className="ml-1.5 text-xs text-neutral-500">— {item.desc}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </motion.div>
-
-            {/* Floating info card — glassmorphism */}
-            <div
-              className="glass-gold absolute bottom-5 left-5 right-5 rounded-2xl p-4"
-            >
-              <p
-                className="mb-2 text-xs font-medium uppercase"
-                style={{ color: "var(--brand)", letterSpacing: "0.16em" }}
-              >
-                {hero.heroCard.label}
-              </p>
-              <div className="flex flex-col gap-2">
-                {hero.heroCard.items.map((item) => (
-                  <div key={item.label} className="flex items-center gap-2.5">
-                    <span className="text-xs" style={{ color: "var(--brand)" }}>{item.icon}</span>
-                    <div>
-                      <span className="text-sm font-medium text-neutral-900">{item.label}</span>
-                      <span className="ml-1.5 text-xs text-neutral-500">— {item.desc}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </motion.div>
 
         </div>

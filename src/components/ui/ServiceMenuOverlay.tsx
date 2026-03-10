@@ -3,7 +3,15 @@ import { motion, AnimatePresence, type Variants } from "framer-motion"
 import { siteContent } from "@/content/siteContent"
 import { useBooking } from "@/context/BookingContext"
 
-type CategoryId = "botox" | "fillers"
+type CategoryId = string
+
+interface PackageItem {
+  label: string
+  sublabel: string
+  price: string
+  highlight: boolean
+  bookingUrl: string
+}
 
 interface ServiceMenuOverlayProps {
   isOpen: boolean
@@ -207,6 +215,7 @@ export default function ServiceMenuOverlay({
 }: ServiceMenuOverlayProps) {
   const [activeCategory, setActiveCategory] = useState<CategoryId>(initialCategory)
   const { categories } = siteContent.services
+  const { company } = siteContent
   const { openBooking } = useBooking()
 
   // Sync initial category when overlay opens
@@ -235,9 +244,7 @@ export default function ServiceMenuOverlay({
     return () => window.removeEventListener("keydown", handler)
   }, [isOpen, onClose])
 
-  const botox = categories.find((c) => c.id === "botox")!
-  const fillers = categories.find((c) => c.id === "fillers")!
-  const current = activeCategory === "botox" ? botox : fillers
+  const current = categories.find((c) => c.id === activeCategory) ?? categories[0]
 
   return (
     <AnimatePresence>
@@ -291,7 +298,7 @@ export default function ServiceMenuOverlay({
                     className="mb-1 text-xs font-medium uppercase text-neutral-400"
                     style={{ letterSpacing: "0.18em" }}
                   >
-                    Delatur — Prismeny
+                    {company.name} — Prismeny
                   </p>
                   <h2
                     className="text-2xl font-semibold text-neutral-950 sm:text-3xl"
@@ -312,13 +319,13 @@ export default function ServiceMenuOverlay({
               </div>
 
               {/* ── Category tabs ───────────────────────────────────────── */}
-              <div className="flex shrink-0 gap-2 px-7 pt-5">
-                {[botox, fillers].map((cat) => {
+              <div className="flex shrink-0 flex-wrap gap-2 px-7 pt-5">
+                {categories.map((cat) => {
                   const isActive = activeCategory === cat.id
                   return (
                     <button
                       key={cat.id}
-                      onClick={() => setActiveCategory(cat.id as CategoryId)}
+                      onClick={() => setActiveCategory(cat.id)}
                       className="relative rounded-full px-5 py-2 text-sm font-medium transition-all duration-300"
                       style={{
                         background: isActive ? "var(--brand)" : "transparent",
@@ -357,8 +364,8 @@ export default function ServiceMenuOverlay({
                       {current.description}
                     </p>
 
-                    {/* ── Botox: Package selector ─────────────────────── */}
-                    {activeCategory === "botox" && botox.packages.length > 0 && (
+                    {/* ── Package selector (when category has packages) ─── */}
+                    {current.packages.length > 0 && (
                       <div className="mb-7">
                         <p
                           className="mb-3 text-[11px] font-medium uppercase text-neutral-400"
@@ -372,10 +379,10 @@ export default function ServiceMenuOverlay({
                           initial="hidden"
                           animate="show"
                         >
-                          {botox.packages.map((pkg) => (
+                          {(current.packages as PackageItem[]).map((pkg) => (
                             <motion.button
                               key={pkg.label}
-                              onClick={() => { onClose(); openBooking("botox") }}
+                              onClick={() => { onClose(); openBooking(activeCategory) }}
                               variants={packageVariants}
                               whileHover={{ y: -3, scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
@@ -504,7 +511,7 @@ export default function ServiceMenuOverlay({
                       </div>
                       <div>
                         <p className="text-xs font-medium text-neutral-700">
-                          Alla behandlingar utförs av Caroline Lundberg, legitimerad sjuksköterska
+                          Alla behandlingar utförs av {company.treater}, {company.treaterTitle.toLowerCase()}
                         </p>
                         <p className="mt-0.5 text-xs text-neutral-500">
                           Gratis konsultation ingår. Kontakta oss för personlig rådgivning.

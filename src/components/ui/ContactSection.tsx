@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { siteContent } from "@/content/siteContent"
+
+const { contactFormTreatments } = siteContent
 import RevealOnScroll from "./RevealOnScroll"
 
 type FormState = {
@@ -107,7 +109,7 @@ export default function ContactSection() {
                     label: "Adress",
                     content: (
                       <>
-                        <p className="text-sm font-medium text-neutral-800">{company.addressLine2}</p>
+                        {company.addressLine2 && <p className="text-sm font-medium text-neutral-800">{company.addressLine2}</p>}
                         <p className="text-sm text-neutral-600">{company.address}</p>
                       </>
                     ),
@@ -264,10 +266,9 @@ export default function ContactSection() {
                       style={{ borderColor: "var(--brand-mid)" }}
                     >
                       <option value="">Vilken behandling är du intresserad av?</option>
-                      <option>Botox</option>
-                      <option>Fillers</option>
-                      <option>Stylage Hydro</option>
-                      <option>Konsultation</option>
+                      {contactFormTreatments.map((t) => (
+                        <option key={t}>{t}</option>
+                      ))}
                     </select>
 
                     <textarea

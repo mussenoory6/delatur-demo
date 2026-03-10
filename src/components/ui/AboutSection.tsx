@@ -3,8 +3,6 @@ import { motion, useScroll, useTransform } from "framer-motion"
 import { siteContent } from "@/content/siteContent"
 import RevealOnScroll from "./RevealOnScroll"
 
-const PORTRAIT = "/portrait.png"
-
 const cardVariants = {
   rest: {
     scale: 1,
@@ -87,7 +85,7 @@ export default function AboutSection() {
                 variants={cardVariants}
                 initial="rest"
                 whileHover="hover"
-                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.9, ease: "easeOut" }}
               >
                 {/* Signature border — top-left corner */}
                 <span
@@ -108,8 +106,8 @@ export default function AboutSection() {
                 />
 
                 <img
-                  src={PORTRAIT}
-                  alt="Caroline Lundberg — Founder & Legitimerad sjuksköterska, Delatur"
+                  src={about.image}
+                  alt={`${company.treater} — ${company.treaterTitle}, ${company.name}`}
                   className="aspect-square w-full object-cover"
                   style={{ objectPosition: "center top" }}
                 />
@@ -168,9 +166,9 @@ export default function AboutSection() {
                 className="mb-2 text-3xl font-semibold leading-tight text-neutral-900 md:text-4xl"
                 style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
               >
-                Möt Caroline,{" "}
+                {about.headline},{" "}
                 <em style={{ color: "var(--brand-dark)", fontStyle: "italic" }}>
-                  din legitimerade specialist
+                  {about.headlineEm}
                 </em>
               </h2>
             </RevealOnScroll>
@@ -185,7 +183,7 @@ export default function AboutSection() {
                   letterSpacing: "0.01em",
                 }}
               >
-                Founder &amp; Legitimerad sjuksköterska
+                {company.treaterTitle}
               </p>
             </RevealOnScroll>
 
@@ -217,7 +215,7 @@ export default function AboutSection() {
                   className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white"
                   style={{ backgroundColor: "var(--brand)" }}
                 >
-                  CL
+                  {(company as { initials?: string }).initials ?? company.treater.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-neutral-900">{company.treater}</p>
