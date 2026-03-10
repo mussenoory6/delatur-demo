@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, type Variants } from "framer-motion"
 import { siteContent } from "@/content/siteContent"
 import { useBooking } from "@/context/BookingContext"
 
@@ -95,22 +95,22 @@ const listVariants = {
   },
 }
 
-const rowVariants = {
+const rowVariants: Variants = {
   hidden: { opacity: 0, x: -14, filter: "blur(2px)" },
   show: {
     opacity: 1,
     x: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.48, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 0.48, ease: "easeOut" },
   },
 }
 
-const packageVariants = {
+const packageVariants: Variants = {
   hidden: { opacity: 0, y: 10 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.44, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 0.44, ease: "easeOut" },
   },
 }
 
@@ -278,7 +278,7 @@ export default function ServiceMenuOverlay({
               initial={{ opacity: 0, scale: 0.96, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.97, y: 12 }}
-              transition={{ duration: 0.48, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.48, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* ── Header ─────────────────────────────────────────────── */}
@@ -334,7 +334,7 @@ export default function ServiceMenuOverlay({
                           layoutId="tab-indicator"
                           className="absolute inset-0 rounded-full"
                           style={{ background: "var(--brand)", zIndex: -1 }}
-                          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                          transition={{ duration: 0.3, ease: "easeOut" }}
                         />
                       )}
                     </button>
@@ -350,7 +350,7 @@ export default function ServiceMenuOverlay({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 0.28, ease: "easeOut" }}
                   >
                     {/* Category tagline */}
                     <p className="mb-6 mt-2 max-w-lg text-sm leading-relaxed text-neutral-500">
