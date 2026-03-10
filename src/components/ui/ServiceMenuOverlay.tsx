@@ -188,8 +188,7 @@ function ServiceRow({
           x: hovered ? 0 : 6,
           scale: hovered ? 1 : 0.94,
         }}
-        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-        className="btn-premium btn-glow btn-glow-teal btn-shimmer shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold text-white"
+        transition={{ duration: 0.22, ease: "easeOut" }}        className="btn-premium btn-glow btn-glow-teal btn-shimmer shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold text-white"
         onClick={(e) => { e.stopPropagation(); openBooking(categoryId) }}
         style={{ pointerEvents: hovered ? "auto" : "none" }}
       >
