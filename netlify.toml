@@ -2,7 +2,9 @@
   command = "npm run build"
   publish = "dist"
 
+# SPA fallback — alla rutter ska servera index.html
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = true
