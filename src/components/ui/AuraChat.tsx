@@ -466,7 +466,7 @@ export default function AuraChat() {
     </>
   )
 
-  return typeof document !== "undefined"
+  return typeof document !== "undefined" && document.body
     ? createPortal(chatContent, document.body)
     : chatContent
 }
